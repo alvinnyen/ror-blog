@@ -1,4 +1,5 @@
 # RoR Blog
+應用rails搭建Blog的練習專案，旨在練習Routes及CRUD等相關操作，計劃在未來一週內繼續加上styling和更複雜的資料庫操作，並部署至Heroku讓整個專案更為完整。
 
 ## to start the server on cloud9
 - `rails server -b $ip[ -p $port]`
