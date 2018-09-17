@@ -25,3 +25,19 @@
             - `add_column :articles, :created_at, :datetime`
             - `add_column :articles, :updated_at, :datetime`
     - migration file 只會被run 1 次，執行過就不會再重複執行
+
+## 2. create the model ($projectName/app/models/article.rb) to communicate with the tables
+- remember to follow the naming convention
+- 在model建立的當下，rails會 "自動生成" 該model所對應的table的欄位的setters/getters
+    - can test it through `rails console`
+        - test the connection: `Article.all`
+        - `Article` (this means the Article Model) to check the schema of the table (articles)
+        - i.e. 
+            - `article = new Article(....)` 
+                - 或可用資料欄位setter/getter的方式來替代操作, i.e. `article.description = '....'`
+                - 或`Article.create(...)` # $Model.create(...) 會直接hit the database，不用另外操作save
+            - `article.save` # 最後需要做save所以有的操作才會真正的去hit the database
+                - begin the transaction
+                - generate the sql query
+                - commit the transaction
+            - `Article.all` to check the data row has been inserted
