@@ -51,3 +51,14 @@
     - delete
         - `article.destroy` # it will return the data row/ model instance that was been deleted
         - `Article.all` to check/verify that the data have been deleted
+
+## 4. about the validation
+- maintain data integrity by adding the validation to the model
+    - to avoid the article like this: (title: nil, description: nil....)
+- 在model中加上欄位的constraints，使能在model instance save時去做檢查，避免nil value存入
+    - >> begin transaction
+    - >> rollback transaction
+        - to find out that why rollback
+            - `article.errors.any?` # true
+            - `article.errors.full_messages` # ['title can't be blank]
+    - !! remember to restart the console by `reload!`
