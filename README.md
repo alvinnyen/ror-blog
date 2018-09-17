@@ -41,3 +41,13 @@
                 - generate the sql query
                 - commit the transaction
             - `Article.all` to check the data row has been inserted
+
+## 3. edit and delete a data row
+- into `rails console`
+    - edit
+        - through setter/getter
+            - `article = Article.find($id)` # $Model.find($id)
+            - `article.description = '....'`
+    - delete
+        - `article.destroy` # it will return the data row/ model instance that was been deleted
+        - `Article.all` to check/verify that the data have been deleted
