@@ -1,5 +1,8 @@
 # RoR Blog
 
+## to start the server on cloud9
+- `rails server -b $ip[ -p $port]`
+
 ## 1. create articles table
 - naming convention
     - snake-case for file names
@@ -33,7 +36,7 @@
         - test the connection: `Article.all`
         - `Article` (this means the Article Model) to check the schema of the table (articles)
         - i.e. 
-            - `article = new Article(....)` 
+            - `article = Article.new(...)`
                 - 或可用資料欄位setter/getter的方式來替代操作, i.e. `article.description = '....'`
                 - 或`Article.create(...)` # $Model.create(...) 會直接hit the database，不用另外操作save
             - `article.save` # 最後需要做save所以有的操作才會真正的去hit the database
@@ -62,3 +65,159 @@
             - `article.errors.any?` # true
             - `article.errors.full_messages` # ['title can't be blank]
     - !! remember to restart the console by `reload!`
+
+## 5. demonstrates the functionalities with UI
+- it needs routes、controllers and views
+- lifecycle
+    - ![](https://i.imgur.com/khZpa1r.png)
+        - @ means it's a instance variable # ???
+        - view -> controller -> model
+- add the route of `$rootUrl/articles/new`
+    - add `resources :articles` to $project/config/routes.rb `# resources :$table`
+        - This will add the following routes:
+            - routes path HTTP verb link controller#action
+            - articles index articles GET /articles articles#index
+            - new article new_article GET /articles/new articles#new
+            - create article POST /articles articles#create
+            - edit article edit_article GET /articles/:id articles#edit
+            - update article PATCH /articles/:id articles#update
+            - show article article GET /articles/:id articles#show
+            - delete article DELETE /articles/:id articles#destroy
+        - it will auto-generate the CRUD routes for you
+            - type `rails routes` to check the existence routes
+                - ![](https://i.imgur.com/1uuKIia.png)
+- refresh the page and proceed after check the error (uninitialized constant ArticlesController)
+- add the controller (articles_controller.rb/ArticlesController)
+    - it need the "new action" # based on the url/route
+        ```
+            # $projectName/app/controllers/articles_controller.rb
+        
+            class ArticlesController < ApplicationController
+                def new
+                end
+            end
+        ```
+- refresh the page and proceed after check the error (ArticlesController#new is missing a template for this request format and variant. ....)
+- add the templates in $porject/app/views/articles folder
+    - 因為是articles_controller，所以會去views/articles底下找templates/views by request
+    - add $project/app/views/articles/new.html.erb `# $actionName.html.erb`
+        ```
+            # app/views/articles/new.html.erb
+        
+            <h1> create an article </h1>
+        ```
+    - 增加表單
+        - it's model based form, rails provides some useful tools that you can use with form_helpers (check http://guides.rubyonrails.org/form_helpers.html)
+            ```
+                # app/views/articles/new.html.erb
+            
+                <h1> create an article </h1>
+                
+                <%= form_for @article do |f| %>
+                
+                <% end %>
+            ```
+- refresh the page and proceed after check the error (First argument in form cannot contain nil or be empty)
+    - 不認得template中的@article => 要在controller中去初始化 # why in controller? => 思考整個render flow 
+        ```
+            # app/controllers/articles_controller.rb
+            
+            class ArticlesController < ApplicationController
+                def new
+                    @article = Article.new
+                end
+            end
+        ```
+    - complete the form
+        ```
+           # app/views/articles/new.html.erb
+            
+            <h1> create an article </h1>
+                
+            <%= form_for @article do |f| %>
+                <p>
+                    <%= f.label :title %><br/>
+                    <%= f.text_field :title %>
+                </p>
+                
+                <p>
+                    <%= f.label :description %><br/>
+                    <%= f.text_area :description %>
+                </p>
+                
+                <p>
+                    <%= f.submit %> 
+                </p>
+                
+            <% end %>
+        ```
+- refresh the page then click the button and proceed after check the error (The action 'create' could not be found for ArticlesController.)
+- add the create action to articles_controller
+    ```
+        # app/controllers/articles_controller.rb    
+        
+        ...
+        
+            def create
+                
+            end
+    
+    ```
+- refresh the page then click the button and proceed after check the error
+    - ![](https://i.imgur.com/DGRluxp.png)
+- just render what you get in the controller
+    ```
+        # app/controllers/articles_controller.rb    
+        
+        ...
+        
+            def create
+                render plain: params[:article].inspect
+            end
+    
+    ```
+- refresh and test it
+- save the value by the controller and the action article#create
+    ```
+        # app/controllers/articles_controller.rb    
+        
+        ...
+        
+            def create
+                # render plain: params[:article].inspect
+                
+                @article = Article.new(article_params)
+                @article.save
+            end
+            
+            private
+                def article_params
+                    params.require(:article).permit(:title, :description)
+                end
+    
+    ```
+- refresh the page then click the button, 不用管error，只要在rails console確認資料真的有存database就好
+    - enter the values in the browser  
+    - `Article.all` 
+    - enter the values in the browser
+    - `reload!`
+    - `Article.all` 
+- redirect to articles_show(@article)
+    - type `rails routes` to check the route articles#show
+        ```
+            # app/controllers/articles_controller.rb    
+        
+            ...
+        
+            def create
+                # render plain: params[:article].inspect
+                
+                ....
+                redirect_to article_show(@article)
+            end
+    
+        ```
+    - the article_show will be introduced in the next chapter
+    
+        
+   
